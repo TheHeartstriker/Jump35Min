@@ -10,12 +10,26 @@ function App() {
     html2pdf().from(content).save("markdown.pdf");
   };
 
-  const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(markdown).then(() => {
-      alert("Copied to clipboard!");
-    });
-  };
+  const handleCopyToClipboard = async () => {
+    try {
+      const contentElement = document.getElementById("renderedMarkdown");
+      const htmlContent = contentElement.innerHTML; // HTML version
+      const plainText = contentElement.textContent; // Plain text fallback
 
+      // Create a clipboard item with both HTML and plain text
+      const clipboardItem = new ClipboardItem({
+        "text/html": new Blob([htmlContent], { type: "text/html" }),
+        "text/plain": new Blob([plainText], { type: "text/plain" }),
+      });
+
+      // Write to clipboard
+      await navigator.clipboard.write([clipboardItem]);
+      alert("Copied to clipboard!");
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+      alert("Failed to copy to clipboard.");
+    }
+  };
   return (
     <div style={{ display: "flex", height: "100vh" }} className="App">
       {/* Left Pane: Markdown Input */}
